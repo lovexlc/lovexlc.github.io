@@ -9,7 +9,7 @@ export const config = {
     title: "Urodele",
   },
   footer: {
-    copyright: "© lovexl",
+    copyright: "©lovexl",
     copyrightUrl: "https://github.com/lovexlc",
   },
   pagination: {
