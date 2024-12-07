@@ -49,7 +49,7 @@ export const getPageList = async (filterDraft = true) => {
 
   const pageData = rawPageData
     // 按照创建时间先后排序
-    .sort((a, b) => a.createTime - b.createTime);
+    .sort((a, b) => b.createTime - a.createTime);
 
   if (filterDraft) {
     const filtered = pageData.filter((p) => !p.draft);
