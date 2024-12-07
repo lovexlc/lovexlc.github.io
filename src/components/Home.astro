@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import Pagination from "../components/Pagination.astro";
 import type { ShortPageData } from "../shared/type";
+import { getReadingTime } from "../shared/reading-time";
 
 interface Props {
   posts: ShortPageData[];
@@ -17,37 +18,65 @@ const { posts, page, pages } = Astro.props;
 
   mount("data-acc-time");
 </script>
-<Layout title="Welcome to Urodele">
-  <div class="w-full h-40 bg-black text-white font-bold text-3xl flex items-center justify-center">Urodele</div>
-  <main>
-    <div class="content">
-      {
-        posts.map((item) => (
-          <>
-            <div class="pt-8 pb-2">
-              <a href={`/post/${item.id}`} class="px-4 pb-4 flex justify-between items-center group">
-                <div class="flex flex-col">
-                  <h1 class="page-title w-[fit-content] text-lg transition-all font-semibold group-hover:underline">
-                    {item.title}
-                  </h1>
-                  <p class="text-text text-opacity-60 text-sm">{item.intro}</p>
-                </div>
-                {item.cover && <img class="w-16 h-16 rounded object-cover" src={item.cover.src} alt={item.cover.alt} />}
-              </a>
-              <div class="flex pt-2 gap-2 px-4">
-                {item.tags.map((tag) => (
-                  <a href={`/tag/${encodeURIComponent(tag)}`} class="text-sm text-gray hover:text-black">
-                    #{tag}
+<Layout title="Welcome to lovexl's blog">
+  <div class="w-full h-60 bg-gradient-to-b from-black to-gray-800 text-white flex flex-col items-center justify-center gap-4">
+    <h1 class="font-bold text-4xl">lovexl's blog</h1>
+    <p class="text-gray-300 text-lg">Thoughts, memories and shares.</p>
+  </div>
+  <main class="py-8">
+    <div class="content max-w-6xl mx-auto px-4">
+      <div class="flex gap-8 <lg:flex-col">
+        <div class="flex-1">
+          {
+            posts.map((item) => (
+              <>
+                <div class="py-8 first:pt-0">
+                  <a href={`/post/${item.id}`} class="group block">
+                    <div class="flex gap-6 <md:flex-col">
+                      {item.cover && (
+                        <div class="w-48 h-32 shrink-0 <md:w-full <md:h-48">
+                          <img class="w-full h-full rounded-lg object-cover" src={item.cover.src} alt={item.cover.alt} />
+                        </div>
+                      )}
+                      <div class="flex flex-col gap-2 flex-1">
+                        <div class="flex gap-2 flex-wrap text-sm text-gray-500">
+                          {item.tags.map((tag) => (
+                            <a href={`/tag/${encodeURIComponent(tag)}`} class="hover:text-primary transition-colors">
+                              #{tag}
+                            </a>
+                          ))}
+                        </div>
+                        <h2 class="text-2xl font-bold <md:text-xl">
+                          <a href={`/post/${item.id}`} class="hover:text-primary transition-colors">
+                            {item.title}
+                          </a>
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-400 line-clamp-2">{item.intro}</p>
+                      </div>
+                    </div>
                   </a>
-                ))}
-              </div>
-              <div data-acc-time={item.createTime} class="text-end text-xs text-gray" />
-            </div>
-            <hr />
-          </>
-        ))
-      }
-      <Pagination page={page} pages={pages} />
+                  <div class="flex items-center gap-4 text-sm text-gray-500 mt-4 ml-[216px] <md:ml-0">
+                    <div class="flex items-center gap-2">
+                      <img src="/images/authors/avatar.jpg" alt="loveclx" class="w-4 h-4 rounded-full object-cover" />
+                      <span>loveclx</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div class="i-ri:time-line w-4 h-4 p-0.5"></div>
+                      <time data-acc-time={item.createTime}></time>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div class="i-ri:book-read-line w-4 h-4 p-0.5"></div>
+                      <span>{getReadingTime(item.intro)} min read</span>
+                    </div>
+                  </div>
+                  <hr class="border-gray-100 dark:border-gray-800" />
+                </div>
+              </>
+            ))
+          }
+          <Pagination page={page} pages={pages} />
+        </div>
+      </div>
     </div>
   </main>
 </Layout>
