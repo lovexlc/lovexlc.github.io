@@ -29,7 +29,19 @@ List&lt;String&gt; path = <span class="hljs-keyword" class="hljs-keyword">new</s
 			<span class="hljs-keyword" class="hljs-keyword">continue</span>;
 		}
 	}	
-}</code></pre></div></div><p></p><p></p><p></p><script type="module">const injectHtml = (root, html) => {
+}</code></pre></div></div><h2 level="2" id="集合中无重复元素">集合中无重复元素</h2><h3 level="3" id="单个元素可重复选取">单个元素可重复选取</h3><p>[combination-sum](<a target="_blank" rel="noopener noreferrer nofollow" href="https://leetcode.com/problems/combination-sum/description/">https://leetcode.com/problems/combination-sum/description/</a>)</p><img src="/post-assets/m4f2d8qm-image.png" alt="image.png"><p></p><p>可以看到，单个元素在树枝中可以重复选取，在数层中不能重复选取</p><div class="llt-code readonly"><div class="language">java</div><div class="wrapper"><pre><code class="language-java"><span class="hljs-keyword" class="hljs-keyword">void</span> <span class="hljs-title,function_" class="hljs-title,function_">backtracking</span><span class="hljs-params" class="hljs-params">(<span class="hljs-type" class="hljs-type">int</span>[] nums, <span class="hljs-type" class="hljs-type">int</span> target, <span class="hljs-type" class="hljs-type">int</span> startIndex)</span> {
+	<span class="hljs-keyword" class="hljs-keyword">if</span>(终止条件) {
+		添加;
+		<span class="hljs-keyword" class="hljs-keyword">return</span>;
+	}
+	
+	<span class="hljs-keyword" class="hljs-keyword">for</span>(<span class="hljs-type" class="hljs-type">int</span> <span class="hljs-variable" class="hljs-variable">i</span> <span class="hljs-operator" class="hljs-operator">=</span> startIndex; i &lt; nums.length; i++) {
+		path.add(nums[i]);
+		<span class="hljs-comment" class="hljs-comment">//回溯时的递归可以重复选取，用i不用i+1</span>
+		backtracking(nums, target - nums[i], i);
+		path.removeLast();
+	}
+}</code></pre></div></div><p></p><script type="module">const injectHtml = (root, html) => {
   const iframe = document.createElement("iframe");
   const htmlContent = `<html><head></head><body>${html}</body></html>`;
   iframe.style.width = "100%";
