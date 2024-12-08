@@ -31,17 +31,66 @@ const { title, description, footer = true } = Astro.props;
     <title>{["Urodele", title].reverse().join(" | ")}</title>
   </head>
   <body class="text-text bg-bg">
-    <header class="flex justify-between items-center p-2 gap-2 h-10">
-      <a href="/" class="text-button text-lg" aria-label="homepage">
-        <div class="i-ri:menu-4-fill"></div>
-      </a>
-      <div class="flex gap-2 items-center header-operations">
+    <button id="toggleHeader" class="fixed top-2 left-2 text-button text-lg z-10 transition-colors" aria-label="menu">
+      <div class="i-ri:menu-4-fill"></div>
+    </button>
+    <div id="headerOperations" class="fixed top-2 right-2 transition-all duration-300 opacity-0 transform -translate-x-full">
+      <div class="flex gap-2 items-center">
         <slot name="operations" />
         {(<Auth />)}
       </div>
-    </header>
+    </div>
     <slot />
     {footer && <Footer />}
+    <script>
+      let isOpen = false;
+      let clickTimer: number | null = null;
+      const toggleBtn = document.getElementById('toggleHeader');
+      const headerOps = document.getElementById('headerOperations');
+      
+      // Detect if we're on the home page
+      const isHomePage = window.location.pathname === '/';
+      
+      // Set initial state
+      if (toggleBtn) {
+        toggleBtn.classList.add(isHomePage ? 'text-white' : 'text-gray-800');
+      }
+      if (headerOps) {
+        headerOps.classList.add(isHomePage ? 'text-white' : 'text-gray-800');
+        // Show operations on non-homepage
+        if (!isHomePage) {
+          requestAnimationFrame(() => {
+            headerOps.style.transform = 'translateX(0)';
+            headerOps.style.opacity = '1';
+          });
+        }
+      }
+      
+      toggleBtn?.addEventListener('click', (e) => {
+        if (isHomePage) {
+          // On homepage, handle double-click for toggle
+          if (clickTimer === null) {
+            clickTimer = setTimeout(() => {
+              // Single click - navigate to homepage
+              window.location.href = '/';
+              clickTimer = null;
+            }, 200);
+          } else {
+            // Double click - toggle operations
+            clearTimeout(clickTimer);
+            clickTimer = null;
+            isOpen = !isOpen;
+            if (headerOps) {
+              headerOps.style.transform = isOpen ? 'translateX(0)' : 'translateX(-100%)';
+              headerOps.style.opacity = isOpen ? '1' : '0';
+            }
+          }
+        } else {
+          // On other pages, just navigate home on click
+          window.location.href = '/';
+        }
+      });
+    </script>
   </body>
 </html>
 <style is:global>
