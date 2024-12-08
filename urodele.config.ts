@@ -6,7 +6,7 @@ export const config = {
     logInAuthUrl: "",
   },
   head: {
-    title: "Urodele",
+    title: "lovexl",
   },
   footer: {
     copyright: "© lovexl",

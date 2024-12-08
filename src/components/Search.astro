@@ -1,0 +1,154 @@
+---
+---
+
+<div class="search-container relative group flex justify-center">
+  <div class="search-icon w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 cursor-pointer">
+    <div class="i-ri:search-line w-5 h-5"></div>
+  </div>
+  
+  <div class="search-box absolute top-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 -translate-x-1/2 left-1/2">
+    <div class="flex items-center bg-white rounded-lg shadow-sm min-w-[300px]">
+      <input 
+        type="text" 
+        id="searchInput"
+        placeholder="搜索文章..." 
+        class="w-full px-4 py-2 text-gray-700 bg-transparent outline-none rounded-l-lg"
+      />
+      <button 
+        id="searchButton"
+        class="px-4 py-2 text-gray-500 hover:text-gray-700 transition-colors rounded-r-lg hover:bg-gray-50"
+        aria-label="Search"
+      >
+        <div class="i-ri:search-line w-5 h-5"></div>
+      </button>
+    </div>
+    <div 
+      id="searchResults" 
+      class="absolute w-full mt-2 bg-white rounded-lg shadow-lg overflow-hidden hidden z-10"
+    >
+    </div>
+  </div>
+</div>
+
+<script>
+  let debounceTimer: number;
+  let currentQuery = '';
+
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+  const searchButton = document.getElementById('searchButton');
+  const searchResults = document.getElementById('searchResults');
+  const searchBox = document.querySelector('.search-box') as HTMLElement;
+
+  async function performSearch() {
+    const query = searchInput?.value.trim();
+    if (!query) {
+      hideResults();
+      return;
+    }
+
+    if (query === currentQuery) {
+      return;
+    }
+
+    currentQuery = query;
+    try {
+      const response = await fetch(`/api/post/search?q=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error('Search failed');
+      }
+
+      const results = await response.json();
+      updateResults(results, query);
+    } catch (error) {
+      console.error('Search error:', error);
+      showError();
+    }
+  }
+
+  function updateResults(results: any[], query: string) {
+    if (!searchResults) return;
+
+    if (results.length === 0) {
+      searchResults.innerHTML = `
+        <div class="p-4 text-gray-500 text-center">
+          未找到与 "${query}" 相关的文章
+        </div>
+      `;
+    } else {
+      searchResults.innerHTML = results
+        .map(post => `
+          <a href="/post/${post.id}" class="block p-4 hover:bg-gray-50 border-b last:border-b-0">
+            <div class="font-medium text-gray-900">${post.title}</div>
+            <div class="text-sm text-gray-500 mt-1 line-clamp-2">${post.intro}</div>
+            ${post.tags.length > 0 ? `
+              <div class="flex gap-2 mt-2 flex-wrap">
+                ${post.tags.map(tag => `
+                  <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">${tag}</span>
+                `).join('')}
+              </div>
+            ` : ''}
+          </a>
+        `)
+        .join('');
+    }
+
+    showResults();
+  }
+
+  function showError() {
+    if (!searchResults) return;
+    searchResults.innerHTML = `
+      <div class="p-4 text-red-500 text-center">
+        搜索出错，请稍后重试
+      </div>
+    `;
+    showResults();
+  }
+
+  function showResults() {
+    searchResults?.classList.remove('hidden');
+  }
+
+  function hideResults() {
+    searchResults?.classList.add('hidden');
+    currentQuery = '';
+  }
+
+  // 输入事件监听
+  searchInput?.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(performSearch, 300);
+  });
+
+  // 搜索按钮点击
+  searchButton?.addEventListener('click', () => {
+    clearTimeout(debounceTimer);
+    performSearch();
+  });
+
+  // 点击外部关闭结果
+  document.addEventListener('click', (e) => {
+    const target = e.target as Node;
+    const searchContainer = document.querySelector('.search-container');
+    if (!searchContainer?.contains(target)) {
+      hideResults();
+    }
+  });
+
+  // 键盘事件处理
+  searchInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      clearTimeout(debounceTimer);
+      performSearch();
+    } else if (e.key === 'Escape') {
+      hideResults();
+    }
+  });
+
+  // 搜索框获得焦点时自动搜索
+  searchInput?.addEventListener('focus', () => {
+    if (searchInput.value.trim()) {
+      performSearch();
+    }
+  });
+</script>

@@ -13,7 +13,7 @@ const { title, description, footer = true } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/favicon.png" />
@@ -30,21 +30,23 @@ const { title, description, footer = true } = Astro.props;
     <link rel="icon" href="/favicon.ico" />
     <title>{["Urodele", title].reverse().join(" | ")}</title>
   </head>
-  <body class="text-text bg-bg">
-    <button id="toggleHeader" class="fixed top-2 left-2 text-button text-lg z-10 transition-colors" aria-label="menu">
+  <body class="bg-white text-gray-900">
+    <button id="toggleHeader" class="fixed top-2 left-2 text-gray-600 text-lg z-10 transition-colors" aria-label="menu">
       <div class="i-ri:menu-4-fill"></div>
     </button>
-    <div id="headerOperations" class="fixed top-2 right-2 transition-all duration-300 opacity-0 transform -translate-x-full">
-      <div class="flex gap-2 items-center">
-        <slot name="operations" />
-        {(<Auth />)}
-      </div>
+    <div class="fixed top-2 right-2 flex gap-2 items-center z-10">
+      <slot name="operations" />
+      <Auth />
+    </div>
+    <div id="headerOperations" class="fixed top-2 right-12 flex gap-2 items-center z-10 transition-all duration-300 opacity-0 transform -translate-x-full">
+      <slot name="operations" />
+      <Auth />
     </div>
     <slot />
     {footer && <Footer />}
     <script>
       let isOpen = false;
-      let clickTimer: number | null = null;
+      let clickTimer = null;
       const toggleBtn = document.getElementById('toggleHeader');
       const headerOps = document.getElementById('headerOperations');
       
@@ -53,10 +55,10 @@ const { title, description, footer = true } = Astro.props;
       
       // Set initial state
       if (toggleBtn) {
-        toggleBtn.classList.add(isHomePage ? 'text-white' : 'text-gray-800');
+        toggleBtn.classList.add(isHomePage ? 'text-gray-900' : 'text-gray-600');
       }
       if (headerOps) {
-        headerOps.classList.add(isHomePage ? 'text-white' : 'text-gray-800');
+        headerOps.classList.add(isHomePage ? 'text-gray-900' : 'text-gray-600');
         // Show operations on non-homepage
         if (!isHomePage) {
           requestAnimationFrame(() => {
@@ -93,19 +95,83 @@ const { title, description, footer = true } = Astro.props;
     </script>
   </body>
 </html>
+
 <style is:global>
+  :root {
+    --text-color: #374151;
+    --bg-color: #ffffff;
+    --button-color: #4b5563;
+    --border-color: #e5e7eb;
+    --accent: 136, 58, 234;
+    --accent-light: 224, 204, 250;
+    --accent-dark: 49, 10, 101;
+    --accent-gradient: linear-gradient(
+      45deg,
+      rgb(var(--accent)),
+      rgb(var(--accent-light)) 30%,
+      white 60%
+    );
+  }
+
+  html {
+    font-family: system-ui, sans-serif;
+    background: #13151a;
+    background-size: 224px;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
   main {
+    margin: 0 auto;
+    padding: 1rem;
+    width: 100%;
+    max-width: 80rem;
+    box-sizing: border-box;
     display: flex;
     width: 100%;
     padding: 0 16px;
     gap: 12px;
     justify-content: center;
   }
+
   .content {
-    /* width: 100%; */
-    max-width: 720px;
-    /* padding: 0 24px; */
     overflow-x: hidden;
     flex: 1 1 0;
+    max-width: 720px;
+    /* padding: 0 24px; */
+  }
+
+  .text-text {
+    color: var(--text-color);
+  }
+
+  .bg-bg {
+    background-color: var(--bg-color);
+  }
+
+  .text-button {
+    color: var(--button-color);
+  }
+
+  .border-border {
+    border-color: var(--border-color);
+  }
+
+  code {
+    font-family:
+      Menlo,
+      Monaco,
+      Lucida Console,
+      Liberation Mono,
+      DejaVu Sans Mono,
+      Bitstream Vera Sans Mono,
+      Courier New,
+      monospace;
   }
 </style>

@@ -1,0 +1,40 @@
+---
+import type { ShortPageData } from "../shared/type";
+
+interface Props {
+  posts: ShortPageData[];
+}
+
+const { posts } = Astro.props;
+const uniqueTags = [...new Set(posts.map(p => p.tags).flat())].slice(0, 10);
+---
+
+<div class="space-y-6">
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h3 class="text-lg font-bold mb-4 text-gray-900">About Me</h3>
+    <div class="flex items-center gap-4 mb-4">
+      <img src="/images/authors/avatar.jpg" alt="lovexl" class="w-16 h-16 rounded-full object-cover" />
+      <div>
+        <div class="font-bold text-gray-900">lovexl</div>
+        <div class="text-sm text-gray-500">Software Engineer</div>
+      </div>
+    </div>
+    <p class="text-sm text-gray-600">
+      奶爸一枚, 从事java, 努力学习大模型中
+    </p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <h3 class="text-lg font-bold mb-4 text-gray-900">Popular Tags</h3>
+    <div class="flex flex-wrap gap-2">
+      {uniqueTags.map(tag => (
+        <a
+          href={`/tag/${encodeURIComponent(tag)}`}
+          class="px-3 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors text-sm"
+        >
+          {tag}
+        </a>
+      ))}
+    </div>
+  </div>
+</div>
