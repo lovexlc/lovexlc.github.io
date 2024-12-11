@@ -31,13 +31,38 @@
 </div>
 
 <script>
+  import { getGlobalData } from '../utils/data';
+  
   let debounceTimer: number;
   let currentQuery = '';
+  let allPosts: any[] = [];
 
   const searchInput = document.getElementById('searchInput') as HTMLInputElement;
   const searchButton = document.getElementById('searchButton');
   const searchResults = document.getElementById('searchResults');
   const searchBox = document.querySelector('.search-box') as HTMLElement;
+
+  // 初始化时获取所有文章数据
+  async function initializeSearch() {
+    try {
+      allPosts = await getGlobalData();
+    } catch (error) {
+      console.error('Failed to load posts:', error);
+    }
+  }
+
+  // 本地搜索实现
+  function searchPosts(query: string) {
+    if (!query) return [];
+    
+    const normalizedQuery = query.toLowerCase();
+    return allPosts.filter(post => {
+      const titleMatch = post.title.toLowerCase().includes(normalizedQuery);
+      const contentMatch = post.intro?.toLowerCase().includes(normalizedQuery);
+      const tagsMatch = post.tags.some(tag => tag.toLowerCase().includes(normalizedQuery));
+      return titleMatch || contentMatch || tagsMatch;
+    });
+  }
 
   async function performSearch() {
     const query = searchInput?.value.trim();
@@ -52,12 +77,8 @@
 
     currentQuery = query;
     try {
-      const response = await fetch(`/api/post/search?q=${encodeURIComponent(query)}`);
-      if (!response.ok) {
-        throw new Error('Search failed');
-      }
-
-      const results = await response.json();
+      // 使用本地搜索替代API调用
+      const results = searchPosts(query);
       updateResults(results, query);
     } catch (error) {
       console.error('Search error:', error);
@@ -79,7 +100,7 @@
         .map(post => `
           <a href="/post/${post.id}" class="block p-4 hover:bg-gray-50 border-b last:border-b-0">
             <div class="font-medium text-gray-900">${post.title}</div>
-            <div class="text-sm text-gray-500 mt-1 line-clamp-2">${post.intro}</div>
+            <div class="text-sm text-gray-500 mt-1 line-clamp-2">${post.intro || ''}</div>
             ${post.tags.length > 0 ? `
               <div class="flex gap-2 mt-2 flex-wrap">
                 ${post.tags.map(tag => `
@@ -113,6 +134,9 @@
     searchResults?.classList.add('hidden');
     currentQuery = '';
   }
+
+  // 初始化搜索
+  initializeSearch();
 
   // 输入事件监听
   searchInput?.addEventListener('input', () => {
