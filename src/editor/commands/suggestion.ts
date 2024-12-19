@@ -3,61 +3,114 @@ import { createMenu } from "./menu.tsx";
 import { Editor } from "@tiptap/core";
 import { pickFile } from "./dialog";
 
+const commands = [
+  {
+    title: "Bold",
+    shortcut: "b",
+    description: "Make text bold",
+    icon: "B",
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).toggleBold().run();
+    },
+  },
+  {
+    title: "Italic",
+    shortcut: "i",
+    description: "Make text italic",
+    icon: "I",
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).toggleItalic().run();
+    },
+  },
+  {
+    title: "Strike",
+    shortcut: "s",
+    description: "Add strikethrough to text",
+    icon: "S",
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).toggleStrike().run();
+    },
+  },
+  {
+    title: "Heading 1",
+    shortcut: "h1",
+    description: "Large section heading",
+    icon: "H1",
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).setNode("heading", { level: 1 }).run();
+    },
+  },
+  {
+    title: "Heading 2",
+    shortcut: "h2",
+    description: "Medium section heading",
+    icon: "H2",
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).setNode("heading", { level: 2 }).run();
+    },
+  },
+  {
+    title: "Heading 3",
+    shortcut: "h3",
+    description: "Small section heading",
+    icon: "H3",
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).setNode("heading", { level: 3 }).run();
+    },
+  },
+  {
+    title: "Code Block",
+    shortcut: "code",
+    description: "Add a code block",
+    icon: "{ }",
+    command: ({ editor, range }: any) => {
+      (editor as Editor).chain().focus().deleteRange(range).setCodeBlock().run();
+    },
+  },
+  {
+    title: "Quote",
+    shortcut: "q",
+    description: "Add a blockquote",
+    icon: "❝",
+    command: ({ editor, range }: any) => {
+      (editor as Editor).chain().focus().deleteRange(range).setBlockquote().run();
+    },
+  },
+  {
+    title: "Task List",
+    shortcut: "task",
+    description: "Add a task list",
+    icon: "☐",
+    command: ({ editor, range }: any) => {
+      (editor as Editor).chain().focus().deleteRange(range).toggleTaskList().run();
+    },
+  },
+  {
+    title: "Image",
+    shortcut: "img",
+    description: "Upload an image",
+    icon: "🖼",
+    command: async ({ editor, range }: any) => {
+      const files = await pickFile();
+      if (!files) return;
+      [...files].forEach((file) => {
+        const url = URL.createObjectURL(file);
+        (editor as Editor).chain().focus().deleteRange(range).setImage({ src: url, alt: file.name }).run();
+      });
+    },
+  },
+];
+
 export default {
   items: ({ query }: any) => {
-    return [
-      {
-        title: "Heading 1",
-        command: ({ editor, range }: any) => {
-          editor.chain().focus().deleteRange(range).setNode("heading", { level: 1 }).run();
-        },
-      },
-      {
-        title: "Heading 2",
-        command: ({ editor, range }: any) => {
-          editor.chain().focus().deleteRange(range).setNode("heading", { level: 2 }).run();
-        },
-      },
-      {
-        title: "Heading 3",
-        command: ({ editor, range }: any) => {
-          editor.chain().focus().deleteRange(range).setNode("heading", { level: 3 }).run();
-        },
-      },
-      {
-        title: "CodeBlock",
-        command: ({ editor, range }: any) => {
-          (editor as Editor).chain().focus().deleteRange(range).setCodeBlock().run();
-        },
-      },
-      {
-        title: "Quote",
-        command: ({ editor, range }: any) => {
-          (editor as Editor).chain().focus().deleteRange(range).setBlockquote().run();
-        },
-      },
-      {
-        title: "Task",
-        command: ({ editor, range }: any) => {
-          (editor as Editor).chain().focus().deleteRange(range).toggleTaskList().run();
-        },
-      },
-      {
-        title: "Image",
-        command: async ({ editor, range }: any) => {
-          // const url = prompt("entre image url")
-          const files = await pickFile();
-          if (!files) return;
-          [...files].forEach((file) => {
-            const url = URL.createObjectURL(file);
-            (editor as Editor).chain().focus().deleteRange(range).setImage({ src: url, alt: file.name }).run();
-          });
-          //   if (url === null) return;
-          //   (editor as Editor).chain().focus().deleteRange(range).setImage({ src: url }).run();
-        },
-      },
-    ]
-      .filter((item) => item.title.toLowerCase().startsWith(query.toLowerCase()))
+    return commands
+      .filter((item) => {
+        const normalizedQuery = query.toLowerCase();
+        return (
+          item.title.toLowerCase().includes(normalizedQuery) ||
+          item.shortcut.toLowerCase().includes(normalizedQuery)
+        );
+      })
       .slice(0, 10);
   },
 
@@ -67,13 +120,6 @@ export default {
 
     return {
       onStart: (props: any) => {
-        // component = new VueRenderer(CommandsList, {
-        //     // using vue 2:
-        //     // parent: this,
-        //     // propsData: props,
-        //     props,
-        //     editor: props.editor,
-        // })
         component = createMenu(props);
         if (!props.clientRect) {
           return;

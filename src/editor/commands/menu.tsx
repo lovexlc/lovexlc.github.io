@@ -1,14 +1,32 @@
 import * as React from "jsx-dom";
 
-export const createMenu = (props: { items: { title: string; command: any }[]; editor: any; command: any }) => {
+export const createMenu = (props: { 
+  items: { 
+    title: string; 
+    description: string; 
+    icon: string; 
+    shortcut: string;
+    command: any 
+  }[]; 
+  editor: any; 
+  command: any 
+}) => {
   const { items } = props;
   const buttons = items.map((item) => {
     return (
       <button
+        class="slash-command-item"
         onClick={() => {
           props.command(item);
         }}>
-        {item.title}
+        <span class="slash-command-icon">{item.icon}</span>
+        <div class="slash-command-content">
+          <div class="slash-command-header">
+            <span class="slash-command-title">{item.title}</span>
+            <span class="slash-command-shortcut">/{item.shortcut}</span>
+          </div>
+          <span class="slash-command-description">{item.description}</span>
+        </div>
       </button>
     ) as HTMLElement;
   });
