@@ -103,7 +103,8 @@ const commands = [
 
 export default {
   items: ({ query }: any) => {
-    return commands
+    console.log("用户输入的查询字符串 (query):", query);
+    const filteredItems = commands
       .filter((item) => {
         const normalizedQuery = query.toLowerCase();
         return (
@@ -112,6 +113,8 @@ export default {
         );
       })
       .slice(0, 10);
+    console.log("过滤后的建议项 (filteredItems):", filteredItems);
+    return filteredItems;
   },
 
   render: () => {
