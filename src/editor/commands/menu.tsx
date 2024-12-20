@@ -15,6 +15,7 @@ export const createMenu = (props: {
   const root = <div class="ud-wrapper slash-menu" role="menu"></div> as HTMLElement;
   let buttons: HTMLElement[] = []; // 用于存储按钮元素
   let selectedIndex = 0;
+  let commandRange: { from: number; to: number } | null = null; // 新增：用于存储触发命令的文本范围
 
   const renderButtons = () => {
     buttons = items.map((item) => {
@@ -22,6 +23,10 @@ export const createMenu = (props: {
         <button
           class="slash-command-item"
           onClick={() => {
+            // 在执行命令前删除触发命令的文本
+            if (commandRange) {
+              props.editor.chain().focus().deleteRange(commandRange).run();
+            }
             props.command(item);
             // 执行命令后关闭菜单
             props.editor.chain().focus().run();
