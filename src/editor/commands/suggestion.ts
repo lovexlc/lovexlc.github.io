@@ -118,8 +118,8 @@ export default {
   },
 
   render: () => {
-    let component: ReturnType<typeof createMenu>;
-    let popup: Instance<Props>[] | undefined;
+    let component:
+    let popup:
 
     return {
       onStart: (props: any) => {
