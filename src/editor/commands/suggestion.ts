@@ -118,11 +118,12 @@ export default {
   },
 
   render: () => {
-    let component:
-    let popup:
+    let component: ReturnType<typeof createMenu>;
+    let popup: Instance<Props>[] | undefined;
 
     return {
       onStart: (props: any) => {
+        console.log("Suggestion onStart:", props);
         component = createMenu(props);
         if (!props.clientRect) {
           return;
@@ -140,6 +141,7 @@ export default {
       },
 
       onUpdate(props: any) {
+        console.log("Suggestion onUpdate:", props);
         component.updateProps(props);
 
         if (!props.clientRect) {
